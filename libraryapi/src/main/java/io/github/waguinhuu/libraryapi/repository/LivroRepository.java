@@ -3,21 +3,26 @@ package io.github.waguinhuu.libraryapi.repository;
 import io.github.waguinhuu.libraryapi.model.Autor;
 import io.github.waguinhuu.libraryapi.model.GeneroLivro;
 import io.github.waguinhuu.libraryapi.model.Livro;
+import org.hibernate.query.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.print.Pageable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
  * @see LivroRepositoryTest
  */
-public interface LivroRepository extends JpaRepository<Livro, UUID> {
+public interface LivroRepository extends JpaRepository<Livro, UUID>, JpaSpecificationExecutor {
+
 
     // QUERY METHOD
     // SELECT * FROM livro WHERE id_autor = id do autor
@@ -27,7 +32,7 @@ public interface LivroRepository extends JpaRepository<Livro, UUID> {
     List<Livro> findByTitulo(String titulo);
 
     // SELECT * FROM livro WHERE isbn = isbn
-    List<Livro> findByIsbn(String isbn);
+    Optional<Livro> findByIsbn(String isbn);
 
     // SELECT * FROM livro WHERE titulo = ? and preco = ?
     List<Livro> findByTituloAndPreco(String titulo, BigDecimal preco);
