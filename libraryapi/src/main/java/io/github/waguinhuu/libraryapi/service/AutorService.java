@@ -2,8 +2,10 @@ package io.github.waguinhuu.libraryapi.service;
 
 import io.github.waguinhuu.libraryapi.exceptions.OperacaoNaoPermitidaException;
 import io.github.waguinhuu.libraryapi.model.Autor;
+import io.github.waguinhuu.libraryapi.model.Usuario;
 import io.github.waguinhuu.libraryapi.repository.AutorRepository;
 import io.github.waguinhuu.libraryapi.repository.LivroRepository;
+import io.github.waguinhuu.libraryapi.security.SecurityService;
 import io.github.waguinhuu.libraryapi.validator.AutorValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
@@ -21,9 +23,13 @@ public class AutorService {
     private final AutorRepository repository;
     private final AutorValidator validator;
     private final LivroRepository livroRepository;
+    private final SecurityService securityService;
 
     public Autor salvar(Autor autor){
+        Usuario usuario = securityService.obterUsuarioLogado();
+
         validator.validar(autor);
+        autor.setUsuario(usuario);
         return repository.save(autor);
     }
 
