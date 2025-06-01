@@ -1,7 +1,6 @@
 package io.github.waguinhuu.libraryapi.config;
 
 import io.github.waguinhuu.libraryapi.security.CustomUserDetailsService;
-import io.github.waguinhuu.libraryapi.security.JwtCustomAuthenticationFilter;
 import io.github.waguinhuu.libraryapi.security.LoginSocialSuccessHandler;
 import io.github.waguinhuu.libraryapi.service.UsuarioService;
 import org.springframework.context.annotation.Bean;
@@ -11,7 +10,6 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,7 +17,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
-import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -31,9 +28,10 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            LoginSocialSuccessHandler successHandler, JwtCustomAuthenticationFilter jwtCustomAuthenticationFilter) throws Exception {
+            LoginSocialSuccessHandler successHandler) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
+                .httpBasic(Customizer.withDefaults())
                 .formLogin(configurer -> {
                     configurer.loginPage("/login");
                 })
@@ -48,21 +46,7 @@ public class SecurityConfiguration {
                             .successHandler(successHandler);
                 })
                 .oauth2ResourceServer(oauth2RS -> oauth2RS.jwt(Customizer.withDefaults()))
-                .addFilterAfter(jwtCustomAuthenticationFilter, BearerTokenAuthenticationFilter.class)
                 .build();
-    }
-
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer(){
-        return web -> web.ignoring().requestMatchers(
-                   "/v2/api/docs/**",
-                   "/v3/api/docs/**",
-                    "/swagger-resources/**",
-                    "/swagger-ui.html",
-                    "/swagger-ui/**",
-                    "/webjars/**",
-                    "/actuator/**"
-            );
     }
 
     // Configura o prefixo ROLE
